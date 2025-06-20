@@ -1,9 +1,23 @@
 import asyncio
+import logging
+import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from database import add_subscriber, get_subscribers, get_new_listings, db_setup, get_connection
+from database import (
+    add_subscriber,
+    get_subscribers,
+    get_new_listings,
+    db_setup,
+    get_connection,
+)
 
-API_TOKEN = '7199457799:AAFEi9zIuoZgt0yRcLMKRloNm8vtto6KdK0'
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+API_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+if not API_TOKEN:
+    raise ValueError("TELEGRAM_BOT_TOKEN is not set")
 
 # Инициализируем бота и диспетчер
 bot = Bot(token=API_TOKEN)
