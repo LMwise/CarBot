@@ -1,0 +1,9 @@
+requests
+geopy
+transformers
+torch
+aiogram==2.23.1
+beautifulsoup4
+selenium
+webdriver-manager
+undetected-chromedriver
