@@ -1,10 +1,9 @@
 from bs4 import BeautifulSoup
 import hashlib
-from nlp_utils import analyze_listing, calculate_delivery_cost
-
+from nlp_utils import analyze_listing  # calculate_delivery_cost — убран
 
 def parse_listings(page_source, base_url="https://www.olx.pl"):
-    """Парсинг объявлений с OLX с исправленным поиском города"""
+    """Парсинг объявлений с OLX без расчета доставки"""
     try:
         soup = BeautifulSoup(page_source, 'html.parser')
         listing_blocks = soup.find_all('div', attrs={'data-cy': 'ad-card-title'})
@@ -26,26 +25,23 @@ def parse_listings(page_source, base_url="https://www.olx.pl"):
                 price_tag = block.find('p', attrs={'data-testid': 'ad-price'})
                 price = price_tag.get_text(strip=True) if price_tag else "No Price"
 
-                # --- Локация и дата (Исправлено) ---
+                # --- Локация и дата ---
                 location_date_tag = block.find_next('p', attrs={'data-testid': 'location-date'})
-
                 if location_date_tag:
                     location_date = location_date_tag.get_text(strip=True)
-                    location_date = location_date.split("–")[0].strip()  # Убираем "Odświeżono..."
+                    location_date = location_date.split("–")[0].strip()
                 else:
                     location_date = "No Location/Date"
                     print(f"[WARNING] Город не найден! Полный HTML объявления #{i}:\n{block.find_parent().prettify()[:1000]}")
-
-                delivery_info, delivery_cost = calculate_delivery_cost(location_date)
 
                 # --- Пробег ---
                 mileage_tag = block.find('p', attrs={'data-testid': 'mileage'})
                 mileage = mileage_tag.get_text(strip=True) if mileage_tag else "No Mileage"
 
-                # --- Генерация ID ---
+                # --- ID объявления ---
                 listing_id = hashlib.md5(url.encode()).hexdigest()
 
-                # --- Создание объявления ---
+                # --- Создание словаря объявления ---
                 listing = {
                     'id': listing_id,
                     'title': title,
@@ -53,14 +49,13 @@ def parse_listings(page_source, base_url="https://www.olx.pl"):
                     'location_date': location_date,
                     'mileage': mileage,
                     'url': url,
-                    'delivery_cost': delivery_cost  # Сохранение доставки
+                    'delivery_cost': None  # Временно None
                 }
 
-                # --- Анализ AI ---
+                # --- AI-анализ ---
                 listing = analyze_listing(listing)
 
                 listings.append(listing)
-
 
             except Exception as e:
                 print(f"[ERROR] Ошибка парсинга блока #{i}: {e}")
