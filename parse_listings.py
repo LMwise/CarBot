@@ -1,13 +1,16 @@
 from bs4 import BeautifulSoup
 import hashlib
-from nlp_utils import analyze_listing  # calculate_delivery_cost — убран
+import logging
+from nlp_utils import analyze_listing
+
+logger = logging.getLogger(__name__)
 
 def parse_listings(page_source, base_url="https://www.olx.pl"):
     """Парсинг объявлений с OLX без расчета доставки"""
     try:
         soup = BeautifulSoup(page_source, 'html.parser')
         listing_blocks = soup.find_all('div', attrs={'data-cy': 'ad-card-title'})
-        print(f"[INFO] Найдено блоков объявлений: {len(listing_blocks)}")
+        logger.info(f"Найдено блоков объявлений: {len(listing_blocks)}")
 
         listings = []
 
@@ -32,7 +35,9 @@ def parse_listings(page_source, base_url="https://www.olx.pl"):
                     location_date = location_date.split("–")[0].strip()
                 else:
                     location_date = "No Location/Date"
-                    print(f"[WARNING] Город не найден! Полный HTML объявления #{i}:\n{block.find_parent().prettify()[:1000]}")
+                    logger.warning(
+                        f"Город не найден! Полный HTML объявления #{i}:\n{block.find_parent().prettify()[:1000]}"
+                    )
 
                 # --- Пробег ---
                 mileage_tag = block.find('p', attrs={'data-testid': 'mileage'})
@@ -58,11 +63,11 @@ def parse_listings(page_source, base_url="https://www.olx.pl"):
                 listings.append(listing)
 
             except Exception as e:
-                print(f"[ERROR] Ошибка парсинга блока #{i}: {e}")
+                logger.error(f"Ошибка парсинга блока #{i}: {e}")
                 continue
 
         return listings
 
     except Exception as e:
-        print(f"[FATAL ERROR] Ошибка парсинга страницы: {e}")
+        logger.error(f"Ошибка парсинга страницы: {e}")
         return []

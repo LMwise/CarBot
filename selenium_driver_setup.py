@@ -8,6 +8,7 @@ import undetected_chromedriver as uc
 import time
 import pickle
 import os
+import logging
 
 def get_driver(headless=True):
     """
@@ -30,8 +31,10 @@ def get_driver(headless=True):
     # не используйте driver.maximize_window() или driver.set_window_size().
     return driver
 
-FB_EMAIL = "scandinavians502@gmail.com"
-FB_PASSWORD = "Vbnm921009"
+logger = logging.getLogger(__name__)
+
+FB_EMAIL = os.getenv("FB_EMAIL")
+FB_PASSWORD = os.getenv("FB_PASSWORD")
 COOKIES_PATH = "fb_cookies.pkl"
 
 def get_facebook_driver(headless=True):

@@ -52,12 +52,13 @@ def get_city_coordinates(city_name):
 
 # Функция расчета стоимости доставки
 def calculate_delivery_cost(location):
-    """
-    Рассчитывает стоимость доставки автомобиля в Вроцлав.
-    """
+    """Рассчитывает стоимость доставки автомобиля в Вроцлав."""
 
+    coords = get_city_coordinates(location)
+    if not coords:
+        logger.warning(f"[WARNING] Не удалось определить координаты города {location}")
+        return "N/A", 0.0
 
-    # Расстояние в км
     distance = geodesic(WROCLAW_COORDS, coords).km
 
     # Топливо на путь туда-обратно:

@@ -7,3 +7,5 @@ beautifulsoup4
 selenium
 webdriver-manager
 undetected-chromedriver
+flake8
+pytest
